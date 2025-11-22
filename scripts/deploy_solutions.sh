@@ -80,6 +80,30 @@ download_and_install_dolibarr() {
   log_info "Dolibarr installé dans ${WEB_ROOT}/dolibarr."
 }
 
+download_and_install_glpi() {
+  log_info "Installation de GLPI ${GLPI_VERSION}..."
+
+  cd /tmp
+
+  if [ -f "/opt/archives/glpi-${GLPI_VERSION}.tgz" ]; then
+    cp "/opt/archives/glpi-${GLPI_VERSION}.tgz" .
+    log_info "Archive locale GLPI utilisée."
+  else
+    wget -q "https://github.com/glpi-project/glpi/releases/download/${GLPI_VERSION}/glpi-${GLPI_VERSION}.tgz"
+  fi
+
+  tar -xzf "glpi-${GLPI_VERSION}.tgz" -C "${WEB_ROOT}/"
+
+  chown -R www-data:www-data "${WEB_ROOT}/glpi"
+  chmod -R 755 "${WEB_ROOT}/glpi"
+
+  mkdir -p /var/lib/glpi /var/log/glpi
+  chown -R www-data:www-data /var/lib/glpi /var/log/glpi
+  chmod -R 755 /var/lib/glpi /var/log/glpi
+
+  log_info "GLPI installé dans ${WEB_ROOT}/glpi."
+}
+
 setup_databases() {
   log_info "Configuration des bases de données..."
 
@@ -210,6 +234,7 @@ display_summary() {
 main() {
   install_prerequisites
   download_and_install_dolibarr
+  download_and_install_glpi
   setup_databases
   configure_hosts
   create_default_index
