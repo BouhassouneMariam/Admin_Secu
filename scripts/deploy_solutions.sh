@@ -3,8 +3,8 @@ set -e
 
 # Déploiement auto de Dolibarr et GLPI sur Debian
 
-DOLIBARR_VERSION="18.0.3"
-GLPI_VERSION="10.0.11"
+DOLIBARR_VERSION="22.0.3"
+GLPI_VERSION="11.0.2"
 DOMAIN_NAME="localhost"
 CA_DIR="/etc/ssl/myca"
 CERT_DIR="/etc/apache2/ssl"
@@ -63,8 +63,8 @@ download_and_install_dolibarr() {
     log_info "Utilisation de l'archive locale Dolibarr."
   else
     wget -q \
-      "https://sourceforge.net/projects/dolibarr/files/Dolibarr%20ERP-CRM/${DOLIBARR_VERSION}/dolibarr-${DOLIBARR_VERSION}.tgz/download" \
-      -O "dolibarr-${DOLIBARR_VERSION}.tgz"
+      "https://www.dolibarr.org/files/stable/standard/dolibarr-${DOLIBARR_VERSION}.tgz" \
+       -O "dolibarr-${DOLIBARR_VERSION}.tgz"
   fi
 
   tar -xzf "dolibarr-${DOLIBARR_VERSION}.tgz" -C "${WEB_ROOT}/"
@@ -114,6 +114,62 @@ configure_hosts() {
   log_info "Entrées hosts ajoutées pour Dolibarr et GLPI."
 }
 
+create_default_index() {
+  log_info "Création de la page d'accueil /var/www/html/index.html..."
+
+  mkdir -p /var/www/html
+
+  cat > /var/www/html/index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Serveur d'applications – 4IW</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f4f4f4;
+        }
+        h1 { margin-bottom: .5rem; }
+        .box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 1.5rem;
+            max-width: 700px;
+        }
+        ul { line-height: 1.8; }
+        a { color: #0055aa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code { background: #eee; padding: 0 .25rem; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>Serveur d'applications</h1>
+    <p>Instance de test pour le déploiement automatisé de Dolibarr et GLPI.</p>
+
+    <h2>Applications</h2>
+    <ul>
+        <li><a href="https://dolibarr.localhost">Dolibarr (HTTPS)</a></li>
+        <li><a href="https://glpi.localhost">GLPI (HTTPS)</a></li>
+    </ul>
+
+    <h2>Certificat de l'autorité</h2>
+    <p>
+        Le certificat racine utilisé pour signer les certificats serveurs est
+        disponible ici : <a href="/certs/">/certs/</a>.
+    </p>
+</div>
+</body>
+</html>
+EOF
+
+  log_info "Page d'accueil créée."
+}
+
+
 test_installations() {
   log_info "Redémarrage des services..."
   systemctl restart apache2
@@ -122,7 +178,7 @@ test_installations() {
   echo
   log_info "Tests d'accès :"
 
-  echo "- Page d'accueil (doit répondre, code 200 ou 401) :"
+  echo "- Page d'accueil (Apache par défaut) :"
   curl -s -o /dev/null -w "Code HTTP: %{http_code}\n" http://localhost || true
 
   echo "- Dolibarr (code 200/302 attendu quand SSL sera configuré) :"
@@ -156,6 +212,7 @@ main() {
   download_and_install_dolibarr
   setup_databases
   configure_hosts
+  create_default_index
   test_installations
   display_summary
 }
