@@ -11,3 +11,12 @@
   - Tests après installation et résumé d'installation.
 - Page d'accueil HTML (fichier `/index.html`) qui sera copiée dans `/var/www/html/index.html`
   -Creation fonction create_default_index dans le script deploy_solutions.sh pour automatiser la generation auto de la page d’accueil HTML
+
+
+## Partie réalisée par Danny Fu
+
+- Installation automatisée de GLPI.
+- Mise en place d'une autorité de certification locale (CA) et génération des certificats serveurs.
+- Configuration des vhosts Apache pour servir Dolibarr et GLPI en HTTPS.
+- Publication du certificat racine sur `/certs` pour les postes clients.
+- Protection de la page par défaut Apache par authentification HTTP Basic.
