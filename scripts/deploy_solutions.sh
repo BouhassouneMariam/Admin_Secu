@@ -5,7 +5,7 @@ set -e
 
 DOLIBARR_VERSION="22.0.3"
 GLPI_VERSION="11.0.2"
-DOMAIN_NAME="localhost"
+DOMAIN_NAME="local"
 CA_DIR="/etc/ssl/myca"
 CERT_DIR="/etc/apache2/ssl"
 WEB_ROOT="/var/www"
