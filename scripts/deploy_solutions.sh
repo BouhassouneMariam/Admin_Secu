@@ -126,6 +126,58 @@ setup_databases() {
   log_info "Bases de données Dolibarr et GLPI créées."
 }
 
+setup_ca() {
+  log_info "Création de l'autorité de certification locale..."
+
+  mkdir -p "${CA_DIR}"/{certs,crl,newcerts,private}
+  chmod 700 "${CA_DIR}/private"
+  touch "${CA_DIR}/index.txt"
+  echo 1000 > "${CA_DIR}/serial"
+
+  cat > "${CA_DIR}/openssl.cnf" <<EOF
+[ ca ]
+default_ca = CA_default
+
+[ CA_default ]
+dir               = ${CA_DIR}
+certs             = \$dir/certs
+crl_dir           = \$dir/crl
+new_certs_dir     = \$dir/newcerts
+database          = \$dir/index.txt
+serial            = \$dir/serial
+private_key       = \$dir/private/ca.key.pem
+certificate       = \$dir/certs/ca.cert.pem
+default_md        = sha256
+default_days      = 365
+policy            = policy_loose
+
+[ policy_loose ]
+commonName              = supplied
+
+[ req ]
+default_bits        = 2048
+distinguished_name  = req_distinguished_name
+default_md          = sha256
+
+[ req_distinguished_name ]
+commonName                      = Common Name
+
+EOF
+
+  openssl genrsa -out "${CA_DIR}/private/ca.key.pem" 4096
+  chmod 400 "${CA_DIR}/private/ca.key.pem"
+
+  openssl req -config "${CA_DIR}/openssl.cnf" \
+    -key "${CA_DIR}/private/ca.key.pem" \
+    -new -x509 -days 3650 -sha256 \
+    -out "${CA_DIR}/certs/ca.cert.pem" \
+    -subj "/C=FR/ST=IDF/L=Paris/O=4IW/OU=Web/CN=4IW-CA"
+
+  chmod 444 "${CA_DIR}/certs/ca.cert.pem"
+
+  log_info "Autorité de certification locale créée."
+}
+
 configure_hosts() {
   log_info "Mise à jour du fichier /etc/hosts..."
 
@@ -236,6 +288,7 @@ main() {
   download_and_install_dolibarr
   download_and_install_glpi
   setup_databases
+  setup_ca
   configure_hosts
   create_default_index
   test_installations
