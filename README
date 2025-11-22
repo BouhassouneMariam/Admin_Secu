@@ -1,1 +1,12 @@
 # Projet 4IW – Déploiement Dolibarr & GLPI
+
+## Partie réalisée par Mariam Bouhassoune
+
+- Mise en place de la structure du projet.
+- Script `deploy_solutions.sh` :
+  - Installation des paquets (Apache, MariaDB, PHP et extensions).
+  - Installation de Dolibarr dans `/var/www/dolibarr`.
+  - Création des bases `dolibarr` et `glpi` et des utilisateurs SQL associés.
+  - Mise à jour du fichier `/etc/hosts` pour `dolibarr.localhost` et `glpi.localhost`.
+  - Tests  après installation et résumé d'installation.
+- Page d'accueil HTML (fichier `/index.html`) qui sera copiée dans `/var/www/html/index.html`
