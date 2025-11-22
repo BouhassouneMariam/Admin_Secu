@@ -240,8 +240,8 @@ deploy_client_certificates() {
     <h1>Certificat racine local</h1>
     <p>Ce certificat est utilisé pour signer les certificats de :</p>
     <ul>
-        <li>https://dolibarr.localhost</li>
-        <li>https://glpi.localhost</li>
+        <li>https://dolibarr.local</li>
+        <li>https://glpi.local</li>
     </ul>
     <p>Téléchargement :</p>
     <ul>
@@ -410,8 +410,8 @@ create_default_index() {
 
     <h2>Applications</h2>
     <ul>
-        <li><a href="https://dolibarr.localhost">Dolibarr (HTTPS)</a></li>
-        <li><a href="https://glpi.localhost">GLPI (HTTPS)</a></li>
+        <li><a href="https://dolibarr.local">Dolibarr (HTTPS)</a></li>
+        <li><a href="https://glpi.local">GLPI (HTTPS)</a></li>
     </ul>
 
     <h2>Certificat de l'autorité</h2>
@@ -461,7 +461,7 @@ display_summary() {
   echo "  - glpi     (user: glpi / pass: glpi_pass)"
   echo
   echo "Fichier hosts :"
-  echo "  - entrées ajoutées pour dolibarr.localhost et glpi.localhost"
+  echo "  - entrées ajoutées pour dolibarr.local et glpi.local"
   echo
 }
 
