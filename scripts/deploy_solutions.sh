@@ -178,6 +178,47 @@ EOF
   log_info "Autorité de certification locale créée."
 }
 
+generate_server_certificates() {
+  log_info "Génération des certificats pour Dolibarr et GLPI..."
+
+  mkdir -p "${CERT_DIR}"
+
+  # Dolibarr
+  openssl genrsa -out "${CERT_DIR}/dolibarr.key" 2048
+  openssl req -new -key "${CERT_DIR}/dolibarr.key" \
+    -out "${CERT_DIR}/dolibarr.csr" \
+    -subj "/C=FR/ST=IDF/L=Paris/O=4IW/OU=Web/CN=dolibarr.${DOMAIN_NAME}"
+
+  openssl x509 -req -in "${CERT_DIR}/dolibarr.csr" \
+    -CA "${CA_DIR}/certs/ca.cert.pem" \
+    -CAkey "${CA_DIR}/private/ca.key.pem" \
+    -CAcreateserial \
+    -out "${CERT_DIR}/dolibarr.crt" \
+    -days 365 -sha256 \
+    -extfile <(printf "subjectAltName=DNS:dolibarr.%s,DNS:%s" "${DOMAIN_NAME}" "${DOMAIN_NAME}")
+
+  # GLPI
+  openssl genrsa -out "${CERT_DIR}/glpi.key" 2048
+  openssl req -new -key "${CERT_DIR}/glpi.key" \
+    -out "${CERT_DIR}/glpi.csr" \
+    -subj "/C=FR/ST=IDF/L=Paris/O=4IW/OU=Web/CN=glpi.${DOMAIN_NAME}"
+
+  openssl x509 -req -in "${CERT_DIR}/glpi.csr" \
+    -CA "${CA_DIR}/certs/ca.cert.pem" \
+    -CAkey "${CA_DIR}/private/ca.key.pem" \
+    -CAcreateserial \
+    -out "${CERT_DIR}/glpi.crt" \
+    -days 365 -sha256 \
+    -extfile <(printf "subjectAltName=DNS:glpi.%s,DNS:%s" "${DOMAIN_NAME}" "${DOMAIN_NAME}")
+
+  cp "${CA_DIR}/certs/ca.cert.pem" "${CERT_DIR}/ca.crt"
+
+  chmod 600 "${CERT_DIR}"/*.key
+  chmod 644 "${CERT_DIR}"/*.crt
+
+  log_info "Certificats serveurs générés."
+}
+
 configure_hosts() {
   log_info "Mise à jour du fichier /etc/hosts..."
 
@@ -289,6 +330,7 @@ main() {
   download_and_install_glpi
   setup_databases
   setup_ca
+  generate_server_certificates
   configure_hosts
   create_default_index
   test_installations
