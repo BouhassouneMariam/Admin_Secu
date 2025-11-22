@@ -80,10 +80,33 @@ download_and_install_dolibarr() {
   log_info "Dolibarr installé dans ${WEB_ROOT}/dolibarr."
 }
 
+setup_databases() {
+  log_info "Configuration des bases de données..."
+
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "CREATE DATABASE IF NOT EXISTS dolibarr CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "CREATE USER IF NOT EXISTS 'dolibarr'@'localhost' IDENTIFIED BY 'dolibarr_pass';"
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "GRANT ALL PRIVILEGES ON dolibarr.* TO 'dolibarr'@'localhost';"
+
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "CREATE DATABASE IF NOT EXISTS glpi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "CREATE USER IF NOT EXISTS 'glpi'@'localhost' IDENTIFIED BY 'glpi_pass';"
+  mysql -u root -p"${DB_ROOT_PASS}" -e \
+    "GRANT ALL PRIVILEGES ON glpi.* TO 'glpi'@'localhost';"
+
+  mysql -u root -p"${DB_ROOT_PASS}" -e "FLUSH PRIVILEGES;"
+
+  log_info "Bases de données Dolibarr et GLPI créées."
+}
+
 
 main() {
   install_prerequisites
   download_and_install_dolibarr
+  setup_databases
 }
 
 main
