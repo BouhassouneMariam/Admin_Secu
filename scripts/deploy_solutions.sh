@@ -254,6 +254,65 @@ EOF
   log_info "Certificat racine disponible sur /certs."
 }
 
+configure_apache_ssl() {
+  log_info "Configuration des vhosts Apache pour Dolibarr et GLPI..."
+
+  cat > /etc/apache2/sites-available/dolibarr-ssl.conf <<EOF
+<VirtualHost *:443>
+    ServerName dolibarr.${DOMAIN_NAME}
+    DocumentRoot ${WEB_ROOT}/dolibarr/htdocs
+
+    SSLEngine on
+    SSLCertificateFile ${CERT_DIR}/dolibarr.crt
+    SSLCertificateKeyFile ${CERT_DIR}/dolibarr.key
+    SSLCACertificateFile ${CERT_DIR}/ca.crt
+
+    <Directory ${WEB_ROOT}/dolibarr/htdocs>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName dolibarr.${DOMAIN_NAME}
+    Redirect permanent / https://dolibarr.${DOMAIN_NAME}/
+</VirtualHost>
+EOF
+
+  cat > /etc/apache2/sites-available/glpi-ssl.conf <<EOF
+<VirtualHost *:443>
+    ServerName glpi.${DOMAIN_NAME}
+    DocumentRoot ${WEB_ROOT}/glpi/public
+
+    SSLEngine on
+    SSLCertificateFile ${CERT_DIR}/glpi.crt
+    SSLCertificateKeyFile ${CERT_DIR}/glpi.key
+    SSLCACertificateFile ${CERT_DIR}/ca.crt
+
+    <Directory ${WEB_ROOT}/glpi/public>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php [QSA,L]
+
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName glpi.${DOMAIN_NAME}
+    Redirect permanent / https://glpi.${DOMAIN_NAME}/
+</VirtualHost>
+EOF
+
+  a2ensite dolibarr-ssl.conf
+  a2ensite glpi-ssl.conf
+
+  log_info "Vhosts Dolibarr et GLPI activés."
+}
 
 configure_hosts() {
   log_info "Mise à jour du fichier /etc/hosts..."
@@ -368,6 +427,7 @@ main() {
   setup_ca
   generate_server_certificates
   deploy_client_certificates
+  configure_apache_ssl
   configure_hosts
   create_default_index
   test_installations
