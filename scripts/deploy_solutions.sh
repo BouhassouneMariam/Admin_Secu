@@ -219,6 +219,42 @@ generate_server_certificates() {
   log_info "Certificats serveurs générés."
 }
 
+deploy_client_certificates() {
+  log_info "Déploiement du certificat racine pour les clients..."
+
+  mkdir -p /var/www/html/certs
+
+  cp "${CERT_DIR}/ca.crt" /var/www/html/certs/ca.crt
+
+  cat > /var/www/html/certs/index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Certificat racine local</title>
+    <style>
+        body { font-family: system-ui, sans-serif; margin: 2rem; }
+    </style>
+</head>
+<body>
+    <h1>Certificat racine local</h1>
+    <p>Ce certificat est utilisé pour signer les certificats de :</p>
+    <ul>
+        <li>https://dolibarr.localhost</li>
+        <li>https://glpi.localhost</li>
+    </ul>
+    <p>Téléchargement :</p>
+    <ul>
+        <li><a href="ca.crt">ca.crt</a></li>
+    </ul>
+</body>
+</html>
+EOF
+
+  log_info "Certificat racine disponible sur /certs."
+}
+
+
 configure_hosts() {
   log_info "Mise à jour du fichier /etc/hosts..."
 
@@ -331,6 +367,7 @@ main() {
   setup_databases
   setup_ca
   generate_server_certificates
+  deploy_client_certificates
   configure_hosts
   create_default_index
   test_installations
