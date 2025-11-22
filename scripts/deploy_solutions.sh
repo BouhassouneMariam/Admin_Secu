@@ -52,8 +52,38 @@ install_prerequisites() {
   log_info "Installation des paquets terminée."
 }
 
+download_and_install_dolibarr() {
+  log_info "Installation de Dolibarr ${DOLIBARR_VERSION}..."
+
+  cd /tmp
+
+  # Utiliser l'archive locale si bug passe en ligne
+  if [ -f "/opt/archives/dolibarr-${DOLIBARR_VERSION}.tgz" ]; then
+    cp "/opt/archives/dolibarr-${DOLIBARR_VERSION}.tgz" .
+    log_info "Utilisation de l'archive locale Dolibarr."
+  else
+    wget -q \
+      "https://sourceforge.net/projects/dolibarr/files/Dolibarr%20ERP-CRM/${DOLIBARR_VERSION}/dolibarr-${DOLIBARR_VERSION}.tgz/download" \
+      -O "dolibarr-${DOLIBARR_VERSION}.tgz"
+  fi
+
+  tar -xzf "dolibarr-${DOLIBARR_VERSION}.tgz" -C "${WEB_ROOT}/"
+  mv "${WEB_ROOT}/dolibarr-${DOLIBARR_VERSION}" "${WEB_ROOT}/dolibarr"
+
+  chown -R www-data:www-data "${WEB_ROOT}/dolibarr"
+  chmod -R 755 "${WEB_ROOT}/dolibarr"
+
+  mkdir -p /var/lib/dolibarr/documents
+  chown -R www-data:www-data /var/lib/dolibarr
+  chmod -R 755 /var/lib/dolibarr
+
+  log_info "Dolibarr installé dans ${WEB_ROOT}/dolibarr."
+}
+
+
 main() {
   install_prerequisites
+  download_and_install_dolibarr
 }
 
 main
