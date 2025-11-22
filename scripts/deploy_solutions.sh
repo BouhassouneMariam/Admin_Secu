@@ -102,11 +102,62 @@ setup_databases() {
   log_info "Bases de données Dolibarr et GLPI créées."
 }
 
+configure_hosts() {
+  log_info "Mise à jour du fichier /etc/hosts..."
+
+  grep -q "dolibarr.${DOMAIN_NAME}" /etc/hosts || \
+    echo "127.0.0.1 dolibarr.${DOMAIN_NAME}" >> /etc/hosts
+
+  grep -q "glpi.${DOMAIN_NAME}" /etc/hosts || \
+    echo "127.0.0.1 glpi.${DOMAIN_NAME}" >> /etc/hosts
+
+  log_info "Entrées hosts ajoutées pour Dolibarr et GLPI."
+}
+
+test_installations() {
+  log_info "Redémarrage des services..."
+  systemctl restart apache2
+  systemctl restart mariadb
+
+  echo
+  log_info "Tests d'accès :"
+
+  echo "- Page d'accueil (doit répondre, code 200 ou 401) :"
+  curl -s -o /dev/null -w "Code HTTP: %{http_code}\n" http://localhost || true
+
+  echo "- Dolibarr (code 200/302 attendu quand SSL sera configuré) :"
+  curl -k -s -o /dev/null -w "Code HTTP: %{http_code}\n" https://dolibarr.${DOMAIN_NAME} || true
+
+  echo "- GLPI (code 200/302 attendu quand SSL sera configuré) :"
+  curl -k -s -o /dev/null -w "Code HTTP: %{http_code}\n" https://glpi.${DOMAIN_NAME} || true
+}
+
+display_summary() {
+  echo
+  echo "====================================="
+  echo " Installation terminée (partie base) "
+  echo "====================================="
+  echo
+  echo "Applications :"
+  echo "  - Dolibarr : https://dolibarr.${DOMAIN_NAME}"
+  echo "  - GLPI     : https://glpi.${DOMAIN_NAME}"
+  echo
+  echo "Bases de données :"
+  echo "  - dolibarr (user: dolibarr / pass: dolibarr_pass)"
+  echo "  - glpi     (user: glpi / pass: glpi_pass)"
+  echo
+  echo "Fichier hosts :"
+  echo "  - entrées ajoutées pour dolibarr.localhost et glpi.localhost"
+  echo
+}
 
 main() {
   install_prerequisites
   download_and_install_dolibarr
   setup_databases
+  configure_hosts
+  test_installations
+  display_summary
 }
 
 main
