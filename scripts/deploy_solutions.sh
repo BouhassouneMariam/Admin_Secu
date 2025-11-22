@@ -63,8 +63,8 @@ download_and_install_dolibarr() {
     log_info "Utilisation de l'archive locale Dolibarr."
   else
     wget -q \
-      "https://sourceforge.net/projects/dolibarr/files/Dolibarr%20ERP-CRM/${DOLIBARR_VERSION}/dolibarr-${DOLIBARR_VERSION}.tgz/download" \
-      -O "dolibarr-${DOLIBARR_VERSION}.tgz"
+      "https://www.dolibarr.org/files/stable/standard/dolibarr-${DOLIBARR_VERSION}.tgz" \
+       -O "dolibarr-${DOLIBARR_VERSION}.tgz"
   fi
 
   tar -xzf "dolibarr-${DOLIBARR_VERSION}.tgz" -C "${WEB_ROOT}/"
@@ -122,7 +122,7 @@ test_installations() {
   echo
   log_info "Tests d'accès :"
 
-  echo "- Page d'accueil (doit répondre, code 200 ou 401) :"
+  echo "- Page d'accueil (Apache par défaut) :"
   curl -s -o /dev/null -w "Code HTTP: %{http_code}\n" http://localhost || true
 
   echo "- Dolibarr (code 200/302 attendu quand SSL sera configuré) :"
