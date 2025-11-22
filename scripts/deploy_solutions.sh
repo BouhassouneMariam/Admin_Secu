@@ -195,7 +195,7 @@ generate_server_certificates() {
     -CAcreateserial \
     -out "${CERT_DIR}/dolibarr.crt" \
     -days 365 -sha256 \
-    -extfile <(printf "subjectAltName=DNS:dolibarr.%s,DNS:%s" "${DOMAIN_NAME}" "${DOMAIN_NAME}")
+    -extfile <(printf "subjectAltName=DNS:dolibarr.%s" "${DOMAIN_NAME}")
 
   # GLPI
   openssl genrsa -out "${CERT_DIR}/glpi.key" 2048
@@ -209,7 +209,7 @@ generate_server_certificates() {
     -CAcreateserial \
     -out "${CERT_DIR}/glpi.crt" \
     -days 365 -sha256 \
-    -extfile <(printf "subjectAltName=DNS:glpi.%s,DNS:%s" "${DOMAIN_NAME}" "${DOMAIN_NAME}")
+    -extfile <(printf "subjectAltName=DNS:glpi.%s" "${DOMAIN_NAME}")
 
   cp "${CA_DIR}/certs/ca.cert.pem" "${CERT_DIR}/ca.crt"
 
