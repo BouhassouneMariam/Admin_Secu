@@ -114,6 +114,62 @@ configure_hosts() {
   log_info "Entrées hosts ajoutées pour Dolibarr et GLPI."
 }
 
+create_default_index() {
+  log_info "Création de la page d'accueil /var/www/html/index.html..."
+
+  mkdir -p /var/www/html
+
+  cat > /var/www/html/index.html <<'EOF'
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Serveur d'applications – 4IW</title>
+    <style>
+        body {
+            font-family: system-ui, sans-serif;
+            margin: 0;
+            padding: 2rem;
+            background: #f4f4f4;
+        }
+        h1 { margin-bottom: .5rem; }
+        .box {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 1.5rem;
+            max-width: 700px;
+        }
+        ul { line-height: 1.8; }
+        a { color: #0055aa; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        code { background: #eee; padding: 0 .25rem; }
+    </style>
+</head>
+<body>
+<div class="box">
+    <h1>Serveur d'applications</h1>
+    <p>Instance de test pour le déploiement automatisé de Dolibarr et GLPI.</p>
+
+    <h2>Applications</h2>
+    <ul>
+        <li><a href="https://dolibarr.localhost">Dolibarr (HTTPS)</a></li>
+        <li><a href="https://glpi.localhost">GLPI (HTTPS)</a></li>
+    </ul>
+
+    <h2>Certificat de l'autorité</h2>
+    <p>
+        Le certificat racine utilisé pour signer les certificats serveurs est
+        disponible ici : <a href="/certs/">/certs/</a>.
+    </p>
+</div>
+</body>
+</html>
+EOF
+
+  log_info "Page d'accueil créée."
+}
+
+
 test_installations() {
   log_info "Redémarrage des services..."
   systemctl restart apache2
@@ -156,6 +212,7 @@ main() {
   download_and_install_dolibarr
   setup_databases
   configure_hosts
+  create_default_index
   test_installations
   display_summary
 }
