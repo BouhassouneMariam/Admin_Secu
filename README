@@ -8,5 +8,6 @@
   - Installation de Dolibarr dans `/var/www/dolibarr`.
   - Création des bases `dolibarr` et `glpi` et des utilisateurs SQL associés.
   - Mise à jour du fichier `/etc/hosts` pour `dolibarr.localhost` et `glpi.localhost`.
-  - Tests  après installation et résumé d'installation.
+  - Tests après installation et résumé d'installation.
 - Page d'accueil HTML (fichier `/index.html`) qui sera copiée dans `/var/www/html/index.html`
+  -Creation fonction create_default_index dans le script deploy_solutions.sh pour automatiser la generation auto de la page d’accueil HTML
