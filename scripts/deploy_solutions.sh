@@ -3,8 +3,8 @@ set -e
 
 # Déploiement auto de Dolibarr et GLPI sur Debian
 
-DOLIBARR_VERSION="18.0.3"
-GLPI_VERSION="10.0.11"
+DOLIBARR_VERSION="22.0.3"
+GLPI_VERSION="11.0.2"
 DOMAIN_NAME="localhost"
 CA_DIR="/etc/ssl/myca"
 CERT_DIR="/etc/apache2/ssl"
