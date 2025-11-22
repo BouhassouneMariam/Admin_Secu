@@ -314,6 +314,52 @@ EOF
   log_info "Vhosts Dolibarr et GLPI activés."
 }
 
+secure_default_page() {
+  log_info "Mise en place de l'authentification sur la page par défaut..."
+
+  htpasswd -bc /etc/apache2/.htpasswd admin admin123
+
+  cat > /etc/apache2/sites-available/000-default.conf <<EOF
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+    <Directory /var/www/html>
+        AuthType Basic
+        AuthName "Zone protégée"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+        Options Indexes FollowSymLinks
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+EOF
+
+  cat > /etc/apache2/sites-available/default-ssl.conf <<EOF
+<VirtualHost *:443>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html
+
+    SSLEngine on
+    SSLCertificateFile ${CERT_DIR}/dolibarr.crt
+    SSLCertificateKeyFile ${CERT_DIR}/dolibarr.key
+
+    <Directory /var/www/html>
+        AuthType Basic
+        AuthName "Zone protégée"
+        AuthUserFile /etc/apache2/.htpasswd
+        Require valid-user
+        Options Indexes FollowSymLinks
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+EOF
+
+  a2ensite default-ssl.conf
+
+  log_info "Page par défaut protégée par authentification."
+}
+
 configure_hosts() {
   log_info "Mise à jour du fichier /etc/hosts..."
 
@@ -428,6 +474,7 @@ main() {
   generate_server_certificates
   deploy_client_certificates
   configure_apache_ssl
+  secure_default_page
   configure_hosts
   create_default_index
   test_installations
