@@ -11,7 +11,8 @@
   - Tests après installation et résumé d'installation.
 - Page d'accueil HTML (fichier `/index.html`) qui sera copiée dans `/var/www/html/index.html`
   -Creation fonction create_default_index dans le script deploy_solutions.sh pour automatiser la generation auto de la page d’accueil HTML
-
+  -Création d’un droplet (serveur distant avec configuration de base) sur DigitalOcean, accessible uniquement en SSH.
+- Configuration de l’accès SSH (récupération de la clé publique, autorisation des connexions uniquement en SSH) et connexion au droplet comme sur une VM classique.
 
 ## Partie réalisée par Danny Fu
 
@@ -20,3 +21,5 @@
 - Configuration des vhosts Apache pour servir Dolibarr et GLPI en HTTPS.
 - Publication du certificat racine sur `/certs` pour les postes clients.
 - Protection de la page par défaut Apache par authentification HTTP Basic.
+- Déploiement du projet sur le droplet : clonage du dépôt Git, exécution du script `deploy_solutions.sh`, puis phase de débogage.
+- Configuration réseau afin de permettre à nos postes Windows de se connecter correctement au SNI de la machine.
